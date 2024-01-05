@@ -1,0 +1,6 @@
+# Environments
+/.env
+
+# PyCharm
+/backend/Matrix/.idea/
+

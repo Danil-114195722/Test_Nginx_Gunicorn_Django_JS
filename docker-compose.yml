@@ -1,0 +1,71 @@
+version: '3.8'
+
+
+services:
+  db:
+    image: mysql:8.2.0
+    container_name: matrix_db
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./db_data_volume:/var/lib/mysql
+    ports:
+      - "33066:3306"
+    networks:
+      proj_network:
+        ipv4_address: 172.16.1.2
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: DockerfileBackend
+    container_name: matrix_backend
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./static_archive_back:/static
+    ports:
+      - "8080:8080"
+    networks:
+      proj_network:
+        ipv4_address: 172.16.1.3
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: DockerfileFrontend
+    container_name: matrix_frontend
+    restart: always
+    ports:
+      - "8088:8088"
+    networks:
+      proj_network:
+        ipv4_address: 172.16.1.4
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: DockerfileNginx
+    container_name: matrix_nginx
+    volumes:
+      - ./static_archive_back:/static
+    ports:
+      - "80:80"
+    networks:
+      proj_network:
+        ipv4_address: 172.16.1.5
+    depends_on:
+      - backend
+      - frontend
+
+
+networks:
+  proj_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.16.1.0/24
