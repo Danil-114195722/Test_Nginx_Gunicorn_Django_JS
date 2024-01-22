@@ -3,6 +3,7 @@
 
 # PyCharm
 /backend/Matrix/.idea/
+/.idea
 
 # Docker volumes
 /static_archive_back/
